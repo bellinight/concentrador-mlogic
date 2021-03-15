@@ -1,0 +1,138 @@
+/* 
+    ATENÇÃO: Para o controle de versão do banco de dados será necessário 
+    inserir a TAG, entre [], abaixo a cada nova modificação. Acrescentando 
+    apenas o número sequencial da próxima versão, como por exemplo V2, V3 e 
+    assim por diante.
+*/
+
+--[SCRIPT-V1]
+CREATE TABLE IF NOT EXISTS mex_versao 
+(
+    id serial NOT NULL,
+    descricao character varying(50) NOT NULL,
+    CONSTRAINT mex_versao_pkey PRIMARY KEY (id)
+);
+---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mex_evento 
+(
+    id serial NOT NULL,
+    objeto character varying(100) NOT NULL,
+    id_objeto integer NOT NULL,
+    data_emissao timestamp NOT NULL,
+    evento character varying(100) NOT NULL,
+    propagado boolean NOT NULL,
+    CONSTRAINT mex_evento_pkey PRIMARY KEY (id)
+);
+---------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION atualizar_mex_evento_correspondente_bancario() RETURNS trigger AS $BODY$
+BEGIN
+	IF (TG_OP = 'INSERT') THEN
+		INSERT INTO mex_evento (data_emissao, evento, id_objeto, objeto, propagado) VALUES (now()::timestamp(0), 'Vendido', NEW.id, 'c.bancario', false); 
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$ LANGUAGE plpgsql VOLATILE;
+
+DROP TRIGGER IF EXISTS ins_upd_mex_evento_correspondente_bancario ON correspondentebancario;
+CREATE TRIGGER ins_upd_mex_evento_correspondente_bancario AFTER INSERT OR UPDATE ON correspondentebancario
+   FOR EACH ROW EXECUTE PROCEDURE atualizar_mex_evento_correspondente_bancario();
+---------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION atualizar_mex_evento_recarga_celular() RETURNS trigger AS $BODY$
+BEGIN
+	IF (TG_OP = 'INSERT') THEN
+		INSERT INTO mex_evento (data_emissao, evento, id_objeto, objeto, propagado) VALUES (now()::timestamp(0), 'Vendido', NEW.id, 'recarga', false); 
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$ LANGUAGE plpgsql VOLATILE;
+
+DROP TRIGGER IF EXISTS ins_upd_mex_evento_recarga_celular ON recargacelular;
+CREATE TRIGGER ins_upd_mex_evento_recarga_celular AFTER INSERT OR UPDATE ON recargacelular
+   FOR EACH ROW EXECUTE PROCEDURE atualizar_mex_evento_recarga_celular();
+---------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION atualizar_mex_evento_cupom_fiscal()
+  RETURNS trigger AS
+$BODY$
+DECLARE v_evento VARCHAR(100);
+DECLARE v_existe_registro BOOLEAN;
+DECLARE v_md5_old VARCHAR(32);
+DECLARE v_md5_new VARCHAR(32);
+BEGIN
+	IF (NEW.cancelado) THEN
+		v_evento := 'Cancelado';
+	ELSE
+		v_evento := 'Vendido';
+	END IF;
+	
+	IF (TG_OP = 'INSERT') THEN
+		INSERT INTO mex_evento (data_emissao, evento, id_objeto, objeto, propagado) VALUES (now()::timestamp(0), v_evento, NEW.id, 'venda', false); 
+	ELSEIF (TG_OP = 'UPDATE') THEN
+		v_existe_registro := (SELECT EXISTS (SELECT id FROM mex_evento WHERE id_objeto = NEW.id));  
+		IF(v_existe_registro) THEN
+			IF(NEW.cancelado = false) THEN
+				v_evento = 'Modificado';	
+			END IF;
+			v_md5_old := md5(COALESCE(OLD.idcliente::TEXT, '') || COALESCE(OLD.idsessao::TEXT, '') || COALESCE(OLD.codigo::TEXT,'') 
+					 || COALESCE(OLD.dataabertura::TEXT, '') || COALESCE(OLD.desativado::TEXT, '') || COALESCE(OLD.datafechamento::TEXT, '') 
+					 || COALESCE(OLD.fechado::TEXT, '') || COALESCE(OLD.cancelado::TEXT, '') || COALESCE(OLD.totalizado::TEXT, '') 
+					 || COALESCE(OLD.coo::TEXT, '') || COALESCE(OLD.ccf::TEXT, '') || COALESCE(OLD.serieecf, '') || COALESCE(OLD.desconto::TEXT, '') 
+					 || COALESCE(OLD.acrescimo::TEXT, '') || COALESCE(OLD.modificado::TEXT, '') || COALESCE(OLD.totalliquido::TEXT, '') 
+					 || COALESCE(OLD.id_motivo_cancelamento::TEXT, ''));
+					
+			v_md5_new := md5(COALESCE(NEW.idcliente::TEXT, '') || COALESCE(NEW.idsessao::TEXT, '') || COALESCE(NEW.codigo::TEXT,'') 
+					 || COALESCE(NEW.dataabertura::TEXT, '') || COALESCE(NEW.desativado::TEXT, '') || COALESCE(NEW.datafechamento::TEXT, '') 
+					 || COALESCE(NEW.fechado::TEXT, '') || COALESCE(NEW.cancelado::TEXT, '') || COALESCE(NEW.totalizado::TEXT, '') 
+					 || COALESCE(NEW.coo::TEXT, '') || COALESCE(NEW.ccf::TEXT, '') || COALESCE(NEW.serieecf, '') || COALESCE(NEW.desconto::TEXT, '') 
+					 || COALESCE(NEW.acrescimo::TEXT, '') || COALESCE(NEW.modificado::TEXT, '') || COALESCE(NEW.totalliquido::TEXT, '') 
+					 || COALESCE(NEW.id_motivo_cancelamento::TEXT, ''));
+			RAISE NOTICE '%', v_md5_old;
+			RAISE NOTICE '%', v_md5_new;
+			IF(v_md5_old <> v_md5_new) THEN
+				UPDATE mex_evento SET data_emissao = now()::timestamp(0), evento = v_evento, propagado = false WHERE id_objeto = NEW.id;	
+			END IF;
+		ELSE
+			INSERT INTO mex_evento (data_emissao, evento, id_objeto, objeto, propagado) VALUES (now()::timestamp(0), 'Modificado', NEW.id, 'venda', false);
+		END IF;
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$ LANGUAGE plpgsql VOLATILE;
+
+DROP TRIGGER IF EXISTS ins_upd_mex_evento_cupom_fiscal ON cupomfiscal;
+CREATE TRIGGER ins_upd_mex_evento_cupom_fiscal AFTER INSERT OR UPDATE ON cupomfiscal
+   FOR EACH ROW EXECUTE PROCEDURE atualizar_mex_evento_cupom_fiscal(); 
+---------------------------------------------------------------------
+--[SCRIPT-V2]
+CREATE OR REPLACE FUNCTION atualizar_mex_evento_correspondente_bancario() RETURNS trigger AS $BODY$
+BEGIN
+	IF (TG_OP = 'INSERT') THEN
+		INSERT INTO mex_evento (data_emissao, evento, id_objeto, objeto, propagado) VALUES (now()::timestamp(0), 'Vendido', NEW.id, 'c.bancario', true); 
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$ LANGUAGE plpgsql VOLATILE;
+---------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION atualizar_mex_evento_recarga_celular() RETURNS trigger AS $BODY$
+BEGIN
+	IF (TG_OP = 'INSERT') THEN
+		INSERT INTO mex_evento (data_emissao, evento, id_objeto, objeto, propagado) VALUES (now()::timestamp(0), 'Vendido', NEW.id, 'recarga', true); 
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$ LANGUAGE plpgsql VOLATILE;
+---------------------------------------------------------------------
+--[SCRIPT-V3]
+CREATE OR REPLACE FUNCTION atualizar_mex_evento_recarga_celular() RETURNS trigger AS $BODY$
+BEGIN
+	IF (TG_OP = 'INSERT') THEN
+		INSERT INTO mex_evento (data_emissao, evento, id_objeto, objeto, propagado) VALUES (now()::timestamp(0), 'Vendido', NEW.id, 'recarga', false); 
+	END IF;
+
+	RETURN NEW;
+END;
+$BODY$ LANGUAGE plpgsql VOLATILE;
