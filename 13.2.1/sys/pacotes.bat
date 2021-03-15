@@ -1,8 +1,8 @@
 @echo off
 
-winget install -h Notepad++.Notepad++
-winget install -h RARLab.WinRAR
-winget install -h Devolutions.RemoteDesktopManagerFree
+winget install Notepad++.Notepad++ -h
+winget install RARLab.WinRAR -h
+winget install UltraVNC.UltraVNC -h
 
 timeout /t 5 /nobreak >null
  

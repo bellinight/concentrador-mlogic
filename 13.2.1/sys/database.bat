@@ -1,5 +1,5 @@
 @echo off
-
+timeout /t 5 /nobreak >null
 echo Criando DBMercadologic, aguarde...
 echo Quando solicitado, digite a senha (postgres)
 createdb -h localhost -p 5432 -W -U postgres DBMercadologic
