@@ -1,13 +1,23 @@
 ﻿@echo off
-rem instala CLI WINGET para instalação de programas sideload
+
+echo instala CLI WINGET para instalação de programas sideload
+
 C:\Mercadologic\dist\install-cli.appxbundle
-timeout /t 5 /nobreak >null
-REM C:\Mercadologic\dist\jdk-13.exe /q
-REM Instala PostgreSQL 12
-winget install PostgreSQL.PostgreSQL -h -v "12.4.1"
-REM Instala OPEN JAVA 13 
-winget install ojdkbuild.ojdkbuild -h -v "13.0.3-1"  
-rem tempo de espera Prevenção
+
+echo Aguarde o Final da Instalação para Prosseguir...
+
+pause
+
+echo Instala PostgreSQL 12
+
+winget install  -h PostgreSQL.PostgreSQL -v "12.4.1"
+
+timeout /t 5 >null
+
+echo Instala OPEN JAVA 13 
+
+winget install -h ojdkbuild.ojdkbuild -v "13.0.3-1"  
+
 timeout /t 3 /nobreak >null
 
 exit
