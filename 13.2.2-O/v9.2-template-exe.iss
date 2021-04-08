@@ -57,6 +57,8 @@ InternalCompressLevel=ultra
 UninstallDisplaySize=2
 
 ;Seleciona o Idioma do Instalador
+DisableProgramGroupPage=no
+VersionInfoVersion=13.2.2
 
 [Languages]
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
@@ -104,6 +106,7 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; Value
 Root: HKA; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: ".myp"; ValueData: ""
 
 ;Cria icones no desktop e startmenu
+
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\Concentrador\{#MyAppExeName}"; IconFilename: "{app}\rec\icone.ico"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\Concentrador\{#MyAppExeName}"; IconFilename: "{app}\rec\icone.ico"; Tasks: desktopicon
@@ -116,8 +119,10 @@ Name: "{group}\Ferramentas\{#MyAppBase}"; Filename: "{app}\sys\{#MyDBPDV}"; Icon
 ; Executa scripts em lote (Descrição na Linha)
 
 [Run]
+Filename: "{app}\sys\cp-re.bat"; Flags: postinstall; Description: "Backup de segurança do Concentrador"; StatusMsg: "Copiando arquivos para pasta renomeada no processo..."; Components: BackupConcentrador
 Filename: "{app}\sys\var.bat"; Flags: runhidden; Description: "Adicionando Variaveis de Sistema"; StatusMsg: "Adicionando Variaveis de Ambiente..."; Components: Configuradores
 Filename: "{app}\sys\netshare.bat"; Flags: runhidden; StatusMsg: "Compartilhando pasta Mercadologic..."; Components: Configuradores
+Filename: "{app}\sys\cp-re.bat"; Description: "Backup pasta Concetrador"; StatusMsg: "Backup em andamento...!"
 Filename: "{app}\temp\Java-13.exe"; Description: "Instalador JAVA"; StatusMsg: "Instalando JAVA 13"; Components: JAVA; Tasks: desktopicon
 Filename: "{app}\temp\postgresql-12.exe"; Description: "Instalador Postgres"; StatusMsg: "Instalando PostgreSql"; Components: PostgreSql; Tasks: desktopicon
 ;Filename: "{app}\sys\java13.bat"; Flags: runhidden; Description: "Instalar Programas OpenJDK 13"; StatusMsg: "Instalando OpenJDK 13"; Components: Programas
@@ -128,9 +133,7 @@ Filename: "{app}\sys\database_backup_update.bat"; Description: "Criar e Restaura
 Filename: "{app}\sys\database_restore_create.bat"; Description: "Criar e Restaurar Banco ********"; StatusMsg: "Configurações em andamento...!"; Components: Backuprestore
 
 
-
 ;Download Arquivos Executaveis
-Filename: "{app}\sys\cp-re.bat"; Flags: postinstall; Description: "Backup de segurança do Concentrador"; StatusMsg: "Copiando arquivos para pasta renomeada no processo..."; Components: BackupConcentrador
 
 [Types]
 Name: "Completo"; Description: "Instalação completa"
