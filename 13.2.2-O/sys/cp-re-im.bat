@@ -1,11 +1,10 @@
 @echo off
 cls
-rem echo "Copiando Security para pasta JAVA openJDK"
-rem xcopy /E /Y "C:\Mercadologic\cp-base\security\*.*"  "C:\Program Files\ojdkbuild\java-13-openjdk-13.0.3-1\conf\security\"
-rem timeout /t 3 /nobreak >null
-rem xcopy /E /Y "C:\Mercadologic\cp-base\postgres\"  "C:\Program Files\PostgreSQL\10\data\"
+color 6
+Set /p DirName= Digite a Versao, (*numero e pontos (EX: 13.3.0)):
+rem Copia recursos e imagens do concentrador antigo
 echo "Copiando Recursos e Imagens"
-xcopy /E /Y "C:\Mercadologic\Concentrador\recursos\*.*"  "C:\Mercadologic\Atualizacao\13.2.2\Concentrador\recursos\"
-xcopy /E /Y "C:\Mercadologic\Concentrador\imagens-pdv\*.*"  "C:\Mercadologic\Atualizacao\13.2.2\Concentrador\imagens-pdv\"
+xcopy /E /Y "C:\Mercadologic\Concentrador\recursos\*.*"  "C:\Mercadologic\Atualizacao\%DirName%\Concentrador\recursos\"
+xcopy /E /Y "C:\Mercadologic\Concentrador\imagens-pdv\*.*"  "C:\Mercadologic\Atualizacao\%DirName%\Concentrador\imagens-pdv\"
 timeout /t 3 /nobreak >null
 exit
