@@ -2,9 +2,8 @@
 
 
 echo Criando DBMercadologic, aguarde...
-echo Quando solicitado, digite a senha
 timeout /t 5 /nobreak >null
-createdb -h localhost -p 5432 -W -U postgres DBMercadologic
+createdb -h localhost -p 5432 -w -U postgres DBMercadologic
 echo Banco criado com sucesso
 timeout /t 5 /nobreak >null
 cls

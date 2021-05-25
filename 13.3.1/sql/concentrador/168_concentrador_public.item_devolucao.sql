@@ -1,0 +1,2 @@
+ ALTER TABLE IF EXISTS public.item_devolucao
+ ALTER COLUMN serie TYPE INTEGER USING serie::INTEGER;
