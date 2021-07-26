@@ -1,0 +1,2 @@
+﻿ALTER TABLE public.caixote
+ALTER COLUMN descricao TYPE VARCHAR(130);

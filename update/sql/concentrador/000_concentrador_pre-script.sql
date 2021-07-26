@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.exportar_carga_automatica_agrupamento_pack_virtual();DROP FUNCTION IF EXISTS public.exportar_carga_automatica_tipo_pack_virtual();

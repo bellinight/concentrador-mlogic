@@ -1,0 +1,1 @@
+UPDATE public.formapagamento SET forma_pagamento_sefaz = '18' WHERE nome ILIKE 'Carteira Digital';
