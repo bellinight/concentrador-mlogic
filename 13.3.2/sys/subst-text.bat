@@ -1,3 +1,4 @@
+mode con:cols=80 lines=20
 echo off
 
 Set /p IP= Digite o IP do concentrador:

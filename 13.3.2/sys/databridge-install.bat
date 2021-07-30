@@ -1,4 +1,5 @@
 @echo off
+mode con:cols=80 lines=40
 color 7
 cls
 start C:\Mercadologic\Programas\databridge-1.8.0.msi
