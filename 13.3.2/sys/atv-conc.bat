@@ -1,9 +1,8 @@
+mode con:cols=80 lines=10
 @echo off
-
 color 9
-
 rem Set /p DirName= Digite a Versao que deseja ativar:
-echo "Realmente deseja atualizar para nova versão?"
+echo "Realmente deseja atualizar para nova versao?"
 echo "Este processo não pode ser revertido..."
 rd /s C:\Mercadologic\Concentrador
 echo "Copiando"

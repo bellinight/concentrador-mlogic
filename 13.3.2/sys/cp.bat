@@ -1,3 +1,4 @@
+mode con:cols=80 lines=10
 @echo off
 cls
 rem Set /p vpostgres= Digite a Versao da:
